@@ -208,11 +208,11 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
 
             #  ax_3d.append(ax_3d[0])
             # rotate the Axes3D
-            for angle in range(0, 360):
-                # 仰角 方位角
-                ax_3d[0].view_init(0, 90)
+            # for angle in range(0, 360):
+            #     # 仰角 方位角
+            #     ax_3d[0].view_init(0, 90)
 
-            #  points.set_offsets(keypoints[i])
+            points.set_offsets(keypoints[i])
 
         print('finish one frame\t  {}/{}      '.format(i, limit), end='\r')
 

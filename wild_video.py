@@ -153,7 +153,7 @@ if args.input_npz:
 else:
     viz_output = args.viz_output
 render_animation(input_keypoints, anim_output,
-                    dataset.skeleton(), 25, args.viz_bitrate, cam['azimuth'], args.viz_output,
+                    dataset.skeleton(), 25, args.viz_bitrate, cam['azimuth'], viz_output,
                     limit=args.viz_limit, downsample=args.viz_downsample, size=args.viz_size,
                     input_video_path=args.viz_video, viewport=(cam['res_w'], cam['res_h']),
                     input_video_skip=args.viz_skip)

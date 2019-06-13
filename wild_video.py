@@ -70,7 +70,8 @@ joints_left, joints_right = list(dataset.skeleton().joints_left()), list(dataset
 cam = dataset.cameras()['S1'][0]
 keypoints[..., :2] = normalize_screen_coordinates(keypoints[..., :2], w=cam['res_w'], h=cam['res_h'])
 
-model_pos = TemporalModel(17, input_num, 17,filter_widths=[3, 3, 3, 3, 3], causal=args.causal, dropout=args.dropout, channels=args.channels,
+filter_widths = [int(x) for x in args.architecture.split(',')]
+model_pos = TemporalModel(17, input_num, 17, filter_widths, causal=args.causal, dropout=args.dropout, channels=args.channels,
                             dense=args.dense)
 if torch.cuda.is_available():
     model_pos = model_pos.cuda()
@@ -147,6 +148,10 @@ input_keypoints = image_coordinates(input_keypoints[..., :2], w=cam['res_w'], h=
 #  import ipdb;ipdb.set_trace()
 
 from common.visualization import render_animation
+if args.input_npz:
+    viz_output = args.input_npz.split('.')[0] + '_' +args.checkpoint.split('/')[-1] + time.strftime('_%Y_%m_%d',time.localtime(time.time()))
+else:
+    viz_output = args.viz_output
 render_animation(input_keypoints, anim_output,
                     dataset.skeleton(), 25, args.viz_bitrate, cam['azimuth'], args.viz_output,
                     limit=args.viz_limit, downsample=args.viz_downsample, size=args.viz_size,

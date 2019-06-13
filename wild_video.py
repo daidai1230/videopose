@@ -18,7 +18,7 @@ from common.camera import *
 from common.model import *
 from common.loss import *
 from common.generators import ChunkedGenerator, UnchunkedGenerator
-from time import time
+import time
 
 args = parse_args()
 print(args)

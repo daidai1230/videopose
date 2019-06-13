@@ -21,7 +21,14 @@ from common.generators import ChunkedGenerator, UnchunkedGenerator
 import time
 
 args = parse_args()
+
+if args.input_npz:
+    viz_output = args.input_npz.split('/')[-1].split('.')[0] + '_' + args.checkpoint.split(
+        '/')[-1] + time.strftime('_%Y_%m_%d.', time.localtime(time.time())) + args.viz_output
+else:
+    viz_output = args.viz_output
 print(args)
+print(viz_output)
 
 # record time
 
@@ -155,11 +162,6 @@ input_keypoints = image_coordinates(
 # set default fps = 25 dataset.fps()  = 25
 #  import ipdb;ipdb.set_trace()
 
-if args.input_npz:
-    viz_output = args.input_npz.split('.')[0] + '_' + args.checkpoint.split(
-        '/')[-1] + time.strftime('_%Y_%m_%d.', time.localtime(time.time())) + args.viz_output
-else:
-    viz_output = args.viz_output
 render_animation(input_keypoints, anim_output,
                  dataset.skeleton(
                  ), 25, args.viz_bitrate, cam['azimuth'], viz_output,

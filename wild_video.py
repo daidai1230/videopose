@@ -29,7 +29,6 @@ else:
     viz_output = args.viz_output
 print(args)
 print(viz_output)
-
 # record time
 
 
@@ -47,6 +46,7 @@ dataset = Human36mDataset(dataset_path)  # 'data/data_3d_h36m.npz'
 
 ckpt, time1 = ckpt_time(time0)
 print('load 3D dataset spend {:2f} second'.format(ckpt))
+
 
 # according to output name,generate some format. we use detectron
 metadata = suggest_metadata('detectron_pt_coco')

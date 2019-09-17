@@ -142,4 +142,5 @@ def handle_video(videofile):
     return kpts
 
 if __name__ == "__main__":
-    handle_video()
+    video_name = args.viz_video
+    handle_video(video_name)

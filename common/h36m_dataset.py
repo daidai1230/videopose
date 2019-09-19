@@ -18,13 +18,13 @@ h36m_skeleton = Skeleton(parents=[-1,  0,  1,  2,  3,  4,  0,  6,  7,  8,  9,  0
 
 h36m_cameras_intrinsic_params = [
     {
-        'id': '54138969',
+        'id': 'Equipment',
         'center': [512.54150390625, 515.4514770507812],
         'focal_length': [1145.0494384765625, 1143.7811279296875],
         'radial_distortion': [-0.20709891617298126, 0.24777518212795258, -0.0030751503072679043],
         'tangential_distortion': [-0.0009756988729350269, -0.00142447161488235],
-        'res_w': 1000,
-        'res_h': 1002,
+        'res_w': 1280,
+        'res_h': 720,
         'azimuth': 70, # Only used for visualization
     },
     {

@@ -72,7 +72,7 @@ def handle_video(videofile):
     }
 
     # Data writer
-    save_path = os.path.join(args.outputpath, 'AlphaPose_'+ntpath.basename(videofile).split('.')[0]+'.avi')
+    save_path = os.path.join(args.outputpath, 'AlphaPose_'+ ntpath.basename(videofile).split('.')[0]+'.avi')
     writer = DataWriter(args.save_video, save_path, cv2.VideoWriter_fourcc(*'XVID'), fps, frameSize).start()
 
     im_names_desc =  tqdm(range(data_loader.length()))
@@ -135,7 +135,7 @@ def handle_video(videofile):
             print('error...')
 
     filename = os.path.basename(args.video).split('.')[0]
-    name = '/home/xyliu/experiments/VideoPose3D/data/'+filename + '.npz'
+    name = './data/alphapose_npz/' + filename + '.npz'
     kpts = np.array(kpts).astype(np.float32)
     print('kpts npz save in ', name)
     np.savez_compressed(name, kpts=kpts)

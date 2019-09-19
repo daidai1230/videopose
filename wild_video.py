@@ -21,7 +21,7 @@ from common.generators import ChunkedGenerator, UnchunkedGenerator
 import time
 
 args = parse_args()
-
+ 
 if args.input_npz:
     viz_output = args.input_npz.split('/')[-1].split('.')[0] + '_' + args.checkpoint.split(
         '/')[-1] + time.strftime('_%Y_%m_%d.', time.localtime(time.time())) + args.viz_output
@@ -120,9 +120,9 @@ def evaluate(test_generator, action=None, return_predictions=False):
             # Test-time augmentation (if enabled)
             if test_generator.augment_enabled():
                 # Undo flipping and take average with non-flipped version
+                # [2, frames, 17, 3],前后左右翻转，这是因为训练的时候做了数据增强
                 predicted_3d_pos[1, :, :, 0] *= -1
-                predicted_3d_pos[1, :, joints_left +
-                                 joints_right] = predicted_3d_pos[1, :, joints_right + joints_left]
+                predicted_3d_pos[1, :, joints_left + joints_right] = predicted_3d_pos[1, :, joints_right + joints_left]
                 predicted_3d_pos = torch.mean(
                     predicted_3d_pos, dim=0, keepdim=True)
 
@@ -146,9 +146,11 @@ for subject in dataset.cameras():
     if 'orientation' in dataset.cameras()[subject][args.viz_camera]:
         rot = dataset.cameras()[subject][args.viz_camera]['orientation']
         break
+# 这里的t涉及到尺度变换，R没问题，t看要不要先缩放
 prediction = camera_to_world(prediction, R=rot, t=0)
 
 # We don't have the trajectory, but at least we can rebase the height
+# [frames, 17] 的 z值 ,相当于把z值最小的那一个当作相机高度的0点
 prediction[:, :, 2] -= np.min(prediction[:, :, 2])
 
 anim_output = {'Reconstruction': prediction}

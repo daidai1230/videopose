@@ -53,7 +53,7 @@ metadata = suggest_metadata('detectron_pt_coco')
 print('Loading 2D detections keypoints ...')
 
 if args.input_npz:
-    #如果already exist keypoint npz file
+    #如果already exist keypoint n0pz file
     npz = np.load(args.input_npz)
     keypoints = npz['kpts']
 else:

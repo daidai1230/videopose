@@ -21,7 +21,11 @@ from common.generators import ChunkedGenerator, UnchunkedGenerator
 import time
 
 args = parse_args()
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> d497cc45dea2ba85f5ffbf449dcdc78c9d027b49
 if args.input_npz:
     viz_output = args.input_npz.split('/')[-1].split('.')[0] + '_' + args.checkpoint.split(
         '/')[-1] + time.strftime('_%Y_%m_%d.', time.localtime(time.time())) + args.viz_output
@@ -29,6 +33,10 @@ else:
     viz_output = args.viz_output
 print(args)
 print(viz_output)
+<<<<<<< HEAD
+=======
+
+>>>>>>> d497cc45dea2ba85f5ffbf449dcdc78c9d027b49
 # record time
 
 
@@ -122,7 +130,12 @@ def evaluate(test_generator, action=None, return_predictions=False):
                 # Undo flipping and take average with non-flipped version
                 # [2, frames, 17, 3],前后左右翻转，这是因为训练的时候做了数据增强
                 predicted_3d_pos[1, :, :, 0] *= -1
+<<<<<<< HEAD
                 predicted_3d_pos[1, :, joints_left + joints_right] = predicted_3d_pos[1, :, joints_right + joints_left]
+=======
+                predicted_3d_pos[1, :, joints_left +
+                                 joints_right] = predicted_3d_pos[1, :, joints_right + joints_left]
+>>>>>>> d497cc45dea2ba85f5ffbf449dcdc78c9d027b49
                 predicted_3d_pos = torch.mean(
                     predicted_3d_pos, dim=0, keepdim=True)
 

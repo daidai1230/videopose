@@ -194,8 +194,12 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
                                                [pos[j, 2], pos[j_parent, 2]], zdir='z', c=col))
 
             # 一个 frame 的 scatter image
+<<<<<<< HEAD
             points = ax_in.scatter(
                 *keypoints[i].T, 8, color='red', edgecolors='white', zorder=10)
+=======
+            points = ax_in.scatter(*keypoints[i].T, 8, color='red', edgecolors='white', zorder=10)
+>>>>>>> d497cc45dea2ba85f5ffbf449dcdc78c9d027b49
 
             initialized = True
         else:

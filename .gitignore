@@ -12,4 +12,4 @@ checkpoint/
 *.pth  
 *.weights
 *.avi
-
+Alphapose/models/

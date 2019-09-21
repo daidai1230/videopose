@@ -1,3 +1,4 @@
+from common.visualization import render_image
 from common.visualization import render_animation
 from data.data_utils import suggest_metadata, suggest_pose_importer
 from common.h36m_dataset import Human36mDataset
@@ -21,11 +22,6 @@ from common.generators import ChunkedGenerator, UnchunkedGenerator
 import time
 
 args = parse_args()
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> d497cc45dea2ba85f5ffbf449dcdc78c9d027b49
 if args.input_npz:
     viz_output = args.input_npz.split('/')[-1].split('.')[0] + '_' + args.checkpoint.split(
         '/')[-1] + time.strftime('_%Y_%m_%d.', time.localtime(time.time())) + args.viz_output
@@ -33,10 +29,6 @@ else:
     viz_output = args.viz_output
 print(args)
 print(viz_output)
-<<<<<<< HEAD
-=======
-
->>>>>>> d497cc45dea2ba85f5ffbf449dcdc78c9d027b49
 # record time
 
 
@@ -70,7 +62,6 @@ else:
     video_name = args.viz_video
     keypoints = handle_video(video_name)
 
-
 # 2 代表 keypoint, 3 代表 keypoint and probability score after softmax
 # 2 fit for cpn-pt-243.bin  //  3 for d-pt-243.bin
 input_num = 2
@@ -89,6 +80,13 @@ joints_left, joints_right = list(dataset.skeleton().joints_left()), list(
 cam = dataset.cameras()['S1'][0]
 keypoints[..., :2] = normalize_screen_coordinates(
     keypoints[..., :2], w=cam['res_w'], h=cam['res_h'])
+
+input_keypoints = keypoints.copy()
+render_image(image_coordinates(input_keypoints[..., :2], w=cam['res_w'], h=cam['res_h']), 
+             dataset.skeleton(), 25, args.viz_bitrate, viz_output,
+             viewport=(cam['res_w'], cam['res_h']), size=args.viz_size,
+             limit=args.viz_limit, input_video_path=args.viz_video,
+             input_video_skip=args.viz_skip)
 
 filter_widths = [int(x) for x in args.architecture.split(',')]
 model_pos = TemporalModel(17, input_num, 17, filter_widths, causal=args.causal, dropout=args.dropout, channels=args.channels,
@@ -130,12 +128,8 @@ def evaluate(test_generator, action=None, return_predictions=False):
                 # Undo flipping and take average with non-flipped version
                 # [2, frames, 17, 3],前后左右翻转，这是因为训练的时候做了数据增强
                 predicted_3d_pos[1, :, :, 0] *= -1
-<<<<<<< HEAD
-                predicted_3d_pos[1, :, joints_left + joints_right] = predicted_3d_pos[1, :, joints_right + joints_left]
-=======
                 predicted_3d_pos[1, :, joints_left +
                                  joints_right] = predicted_3d_pos[1, :, joints_right + joints_left]
->>>>>>> d497cc45dea2ba85f5ffbf449dcdc78c9d027b49
                 predicted_3d_pos = torch.mean(
                     predicted_3d_pos, dim=0, keepdim=True)
 
@@ -145,7 +139,6 @@ def evaluate(test_generator, action=None, return_predictions=False):
 
 print('Rendering...')
 #  import ipdb;ipdb.set_trace()
-input_keypoints = keypoints.copy()
 
 gen = UnchunkedGenerator(None, None, [input_keypoints],
                          pad=pad, causal_shift=causal_shift, augment=args.test_time_augmentation,

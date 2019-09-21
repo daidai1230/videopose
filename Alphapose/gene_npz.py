@@ -135,7 +135,7 @@ def handle_video(videofile):
             print('error...')
 
     filename = os.path.basename(args.video).split('.')[0]
-    name = './data/alphapose_npz/' + filename + '.npz'
+    name = './data/alphapose/' + filename + '.npz'
     kpts = np.array(kpts).astype(np.float32)
     print('kpts npz save in ', name)
     np.savez_compressed(name, kpts=kpts)

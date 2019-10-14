@@ -134,6 +134,14 @@ def handle_video(videofile):
         except:
             print('error...')
 
+#  for person_1 in image_1
+#  {
+#     "image_id" : string, image_1_name, 
+#     "category_id" : int, 1 for person
+#     "keypoints" : [x1,y1,c1,...,xk,yk,ck], 
+#     "score" : float,
+#  },
+ 
     filename = os.path.basename(args.video).split('.')[0]
     name = './data/alphapose/' + filename + '.npz'
     kpts = np.array(kpts).astype(np.float32)

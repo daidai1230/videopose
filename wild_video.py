@@ -82,11 +82,13 @@ keypoints[..., :2] = normalize_screen_coordinates(
     keypoints[..., :2], w=cam['res_w'], h=cam['res_h'])
 
 input_keypoints = keypoints.copy()
-render_image(image_coordinates(input_keypoints[..., :2], w=cam['res_w'], h=cam['res_h']), 
-             dataset.skeleton(), 25, args.viz_bitrate, viz_output,
-             viewport=(cam['res_w'], cam['res_h']), size=args.viz_size,
-             limit=args.viz_limit, input_video_path=args.viz_video,
-             input_video_skip=args.viz_skip)
+# 测试用，运行时注释掉
+# render_image(input_keypoints[..., :2],  
+# render_image(image_coordinates(input_keypoints[..., :2], w=cam['res_w'], h=cam['res_h']), 
+#              dataset.skeleton(), 25, args.viz_bitrate, viz_output,
+#              viewport=(cam['res_w'], cam['res_h']), size=args.viz_size,
+#              limit=args.viz_limit, input_video_path=args.viz_video,
+#              input_video_skip=args.viz_skip)
 
 filter_widths = [int(x) for x in args.architecture.split(',')]
 model_pos = TemporalModel(17, input_num, 17, filter_widths, causal=args.causal, dropout=args.dropout, channels=args.channels,

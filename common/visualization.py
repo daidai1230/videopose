@@ -69,9 +69,9 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
     path = './data/' + output.split('.')[0]
     if not os.path.exists(path):
         os.mkdir(path)
-    # plt.ioff()
+    plt.ioff()
     # figsize = (10, 5)
-    fig = plt.figure(figsize=(size*(1 + len(poses)), size))
+    fig = plt.figure(figsize=(size*(1 + len(poses)), size + 2))
     # 2D
     ax_in = fig.add_subplot(1, 1 + len(poses), 1)  # (1,2,1)
     ax_in.get_xaxis().set_visible(False)
@@ -82,12 +82,11 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
     ax_3d = []
     lines_3d = []
     trajectories = []
-    radius = 2
+    radius = 1.7
     # 0, ('Reconstruction', 3d kp)
     for index, (title, data) in enumerate(poses.items()):
         # 3D
-        ax = fig.add_subplot(1, 1 + len(poses), index+2,
-                             projection='3d')  # (1,2,2)
+        ax = fig.add_subplot(1, 1 + len(poses), index+2, projection='3d')  # (1,2,2)
         ax.view_init(elev=15., azim=azim)
         # set 长度范围
         ax.set_xlim3d([-radius/2, radius/2])
@@ -150,7 +149,6 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
     image = None
     lines = []
     numbers = []
-
     points = None
 
     if limit < 1:
@@ -161,12 +159,18 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
     # array([-1,  0,  1,  2,  0,  4,  5,  0,  7,  8,  9,  8, 11, 12,  8, 14, 15])
     parents = skeleton.parents()
     kp_parents = [-1, 0, 0, 1, 2, 0, 0, 5, 6, 7, 8, 0, 0, 11, 12, 13, 14]
+    vis_enhence = True
 
     def update_video(i):
-        nonlocal initialized, image, lines, points
+        nonlocal initialized, image, lines, points, numbers
+        for num in numbers:
+            num.remove()
+        numbers.clear()
         for n, ax in enumerate(ax_3d):  # 只有1个
-            ax.set_xlim3d([-radius/2 + trajectories[n][i, 0],radius/2 + trajectories[n][i, 0]])
-            ax.set_ylim3d([-radius/2 + trajectories[n][i, 1],radius/2 + trajectories[n][i, 1]])
+            ax.set_xlim3d([-radius/2 + trajectories[n][i, 0],
+                           radius/2 + trajectories[n][i, 0]])
+            ax.set_ylim3d([-radius/2 + trajectories[n][i, 1],
+                           radius/2 + trajectories[n][i, 1]])
         # Update 2D poses
         if not initialized:
             image = ax_in.imshow(all_frames[i], aspect='equal')
@@ -181,9 +185,11 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
                     if j % 2 == 1:
                         color_pink = 'blue'
                     # 画图2D
-                    lines.append(ax_in.plot([keypoints[i, j, 0], keypoints[i, kp_parents[j], 0]],
-                                            [keypoints[i, j, 1], keypoints[i, kp_parents[j], 1]], color=color_pink))
-                    numbers.append(ax_in.text(keypoints[i, j, 0], keypoints[i, j, 1], str(j), size = 4))
+                    if vis_enhence:
+                        lines.append(ax_in.plot([keypoints[i, j, 0], keypoints[i, kp_parents[j], 0]],
+                                                [keypoints[i, j, 1], keypoints[i, kp_parents[j], 1]], color=color_pink))
+                        numbers.append(ax_in.text(
+                            keypoints[i, j, 0], keypoints[i, j, 1], str(j), size=4))
 
                 col = 'red' if j in skeleton.joints_right() else 'black'
                 for n, ax in enumerate(ax_3d):
@@ -192,13 +198,17 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
                     lines_3d[n].append(ax.plot([pos[j, 0], pos[j_parent, 0]],
                                                [pos[j, 1], pos[j_parent, 1]],
                                                [pos[j, 2], pos[j_parent, 2]], zdir='z', c=col))
-
-                    numbers.append(ax.text(pos[j, 0], pos[j, 1], pos[j, 2], str(j), color='red'))
+                    if vis_enhence:
+                        text = ''
+                        if j == 6 or j == 3:
+                            text = "%d(%.2f,%.2f,%.2f)" % (
+                                j, pos[j, 0], pos[j, 1], pos[j, 2])
+                        numbers.append(
+                            ax.text(pos[j, 0], pos[j, 1], pos[j, 2], text, color='red'))
 
             # 一个 frame 的 scatter image
             points = ax_in.scatter(
                 *keypoints[i].T, 8, color='red', edgecolors='white', zorder=10)
-            plt.savefig(path + '/' + 'keypoints', dpi=150, bbox_inches='tight')
             initialized = True
         else:
             image.set_data(all_frames[i])
@@ -209,33 +219,41 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
                     continue
 
                 #  # 画图2D
-                #  if len(parents) == keypoints.shape[1]:
-                    lines[j-1][0].set_data([keypoints[i, j, 0], keypoints[i, kp_parents[j], 0]],
-                                           [keypoints[i, j, 1], keypoints[i, kp_parents[j], 1]])
-                    numbers.append(ax_in.text(keypoints[i, j, 0], keypoints[i, j, 1], str(j), size = 4))
+                if len(parents) == keypoints.shape[1]:
+                    if vis_enhence:
+                        lines[j-1][0].set_data([keypoints[i, j, 0], keypoints[i, kp_parents[j], 0]],
+                                               [keypoints[i, j, 1], keypoints[i, kp_parents[j], 1]])
+                        numbers.append(ax_in.text(
+                            keypoints[i, j, 0], keypoints[i, j, 1], str(j), size=4))
 
                 # 3D plot
                 for n, ax in enumerate(ax_3d):
                     pos = poses[n][i]  # one frame key points
-                    lines_3d[n][j -1][0].set_xdata([pos[j, 0], pos[j_parent, 0]])
-                    lines_3d[n][j -1][0].set_ydata([pos[j, 1], pos[j_parent, 1]])
-                    lines_3d[n][j - 1][0].set_3d_properties([pos[j, 2], pos[j_parent, 2]], zdir='z')
-                    numbers.append(ax.text(pos[j, 0], pos[j, 1], pos[j, 2], str(j), color='red'))
+                    lines_3d[n][j -
+                                1][0].set_xdata([pos[j, 0], pos[j_parent, 0]])
+                    lines_3d[n][j -
+                                1][0].set_ydata([pos[j, 1], pos[j_parent, 1]])
+                    lines_3d[n][j - 1][0].set_3d_properties(
+                        [pos[j, 2], pos[j_parent, 2]], zdir='z')
+                    if vis_enhence:
+                        text = ''
+                        if j == 10:
+                            text = "%d(%2f,%2f,%2f)" % (
+                                j, pos[j, 0], pos[j, 1], pos[j, 2])
+                        numbers.append(
+                            ax.text(pos[j, 0], pos[j, 1], pos[j, 2], text, color='red'))
 
             #  ax_3d.append(ax_3d[0])
             # rotate the Axes3D
             # for angle in range(0, 360):
             #     # 仰角 方位角
             #     ax_3d[0].view_init(0, 90)
-            if i%25 == 0:
-                plt.savefig(path + '/' + str(i), dpi=150, bbox_inches='tight')
-            for num in numbers:
-                num.remove()
             points.set_offsets(keypoints[i])
-        plt.show()
-        for num in numbers:
-            num.remove()
-        numbers.clear()
+
+        if i % 25 == 0 and vis_enhence:
+            plt.savefig(path + '/' + str(i), dpi=150, bbox_inches='tight')
+        # plt.show()
+
         print('finish one frame\t  {}/{}      '.format(i, limit), end='\r')
 
     fig.tight_layout()
@@ -248,7 +266,8 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
         writer = Writer(fps=fps, metadata={}, bitrate=bitrate)
         anim.save(path + '/' + output, writer=writer)
     elif output.endswith('.gif'):
-        anim.save(path + '/' + output, dpi=120, writer='imagemagick')
+        # anim.save(output, dpi=80, writer='imagemagick')
+        anim.save(path + '/' + output, dpi=80, writer='imagemagick')
     else:
         raise ValueError(
             'Unsupported output format (only .mp4 and .gif are supported)')
@@ -256,14 +275,23 @@ def render_animation(keypoints, poses, skeleton, fps, bitrate, azim, output, vie
 
 
 def render_image(keypoints, skeleton, fps, bitrate, output, viewport, size=6, limit=-1, input_video_path=None, input_video_skip=0):
-    plt.ioff()
+    # plt.ioff()
 
     figure1 = plt.figure(figsize=(size * 2, size))
+    # figure1.tight_layout()
     figure1 = figure1.add_subplot(111)
     figure1.set_title('Keypoints with score')
-    figure1.get_xaxis().set_visible(False)
-    figure1.get_yaxis().set_visible(False)
-    figure1.set_axis_off()
+    figure1.xaxis.set_ticks_position("top")
+    # figure1.spines["left"].set_color("none")
+    # figure1.spines["bottom"].set_position(('axes',0))
+    # figure1.get_xaxis().set_visible(False)
+    # figure1.get_yaxis().set_visible(False)
+    # figure1.set_axis_off()
+    # radius = 2
+    # figure1.set_xlim([-1, 1])
+    # figure1.set_ylim([-640/720, 640/720])
+    # figure1.set_aspect('equal', 'datalim', 'S')
+    # figure1.xaxis.tick_top()
 
     # Decode video
     if input_video_path is None:
@@ -307,11 +335,12 @@ def render_image(keypoints, skeleton, fps, bitrate, output, viewport, size=6, li
                         color_pink = 'blue'
                 lines.append(figure1.plot([keypoints[i, j, 0], keypoints[i, j_parent, 0]],
                                           [keypoints[i, j, 1], keypoints[i, j_parent, 1]], color=color_pink))
-                numbers.append(figure1.text(keypoints[i, j, 0], keypoints[i, j, 1], str(j),size = 4, color = 'red'))
+                numbers.append(figure1.text(
+                    keypoints[i, j, 0], keypoints[i, j, 1], str(j), size=4, color='red'))
 
             points = figure1.scatter(
                 *keypoints[i].T, 8, color='red', edgecolors='white', zorder=10)
-        else: 
+        else:
             image.set_data(frame)
             points.set_offsets(keypoints[i])
             count = 0
@@ -321,12 +350,13 @@ def render_image(keypoints, skeleton, fps, bitrate, output, viewport, size=6, li
                 count += 1
                 if len(parents) == keypoints.shape[1]:
                     lines[count-1][0].set_data([keypoints[i, j, 0], keypoints[i, j_parent, 0]],
-                                        [keypoints[i, j, 1], keypoints[i, j_parent, 1]])
-                    numbers.append(figure1.text(keypoints[i, j, 0], keypoints[i, j, 1], str(j),size = 4, color = 'yellow'))
+                                               [keypoints[i, j, 1], keypoints[i, j_parent, 1]])
+                    numbers.append(figure1.text(
+                        keypoints[i, j, 0], keypoints[i, j, 1], str(j), size=4, color='yellow'))
 
         if i % 20 == 0:
             plt.savefig(figpath, dpi=150, bbox_inches='tight')
-        figure1.imshow()
+
         plt.show()
         for num in numbers:
             num.remove()
